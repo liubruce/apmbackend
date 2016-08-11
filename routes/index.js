@@ -9,7 +9,7 @@ router.get('/', function (req, res, next) {
 router.post('/sdk/ios', function (req, res, next) {
     console.log(req.body);
 
-    var result = '{"result":"ok_ios"}';
+    var result = '{"result":"1"}';
     var jsonObj = JSON.parse(result);
     res.json(jsonObj);
 });
@@ -17,7 +17,7 @@ router.post('/sdk/ios', function (req, res, next) {
 
 router.post('/sdk/android', function (req, res, next) {
     console.log(req.body);
-    var result = '{"result":"ok_android"}';
+    var result = '{"result":"1"}';
     var jsonObj = JSON.parse(result);
     res.json(jsonObj);
 });
