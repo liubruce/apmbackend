@@ -8,13 +8,18 @@ router.get('/', function (req, res, next) {
 
 router.post('/sdk/ios', function (req, res, next) {
     console.log(req.body);
-    res.json('ok ios');
+
+    var result = '{"result":"1"}';
+    var jsonObj = JSON.parse(result);
+    res.json(jsonObj);
 });
 
 
 router.post('/sdk/android', function (req, res, next) {
     console.log(req.body);
-    res.json('ok android');
+    var result = '{"result":"1"}';
+    var jsonObj = JSON.parse(result);
+    res.json(jsonObj);
 });
 
 
