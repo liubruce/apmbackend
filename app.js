@@ -64,9 +64,4 @@ app.use(function(err, req, res, next) {
 });
 
 
-var httprequest = require('./service/httprequest');
-httprequest.httpPostAPM('/sdk/ios/');
-httprequest.httpPostAPM('/sdk/android/');
-console.log('成功不');
-
 module.exports = app;
