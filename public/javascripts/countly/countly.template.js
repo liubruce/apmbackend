@@ -2463,7 +2463,7 @@ window.ManageAppsView = countlyView.extend({
 
             $.ajax({
                 type:"GET",
-                url:countlyCommon.API_PARTS.apps.w + '/create',
+                url: countlyCommon.API_PARTS.apps.w + '/create',
                 data:{
                     args:JSON.stringify({
                         name:appName,

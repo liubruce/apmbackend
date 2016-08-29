@@ -32,7 +32,6 @@ var apmConfig = require('../config/config', 'dont-enclose');
 //let's start up a cluster
 cluster(function () {
     var app = require('../app');
-
     app.set('port', process.env.PORT || apmConfig.web.port);
 
     var server = app.listen(app.get('port'), function () {

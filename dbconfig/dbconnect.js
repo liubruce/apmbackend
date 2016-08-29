@@ -10,7 +10,11 @@ var dburl = 'mongodb://' + apmConfig.mongodb.host + ':' + apmConfig.mongodb.port
 
 // Use connect method to connect to the server
 
+var Db = require('mongodb').Db,
+    Connection = require('mongodb').Connection,
+    Server = require('mongodb').Server;
 
+module.exports.mongodb = new Db(apmConfig.mongodb.db, new Server(apmConfig.mongodb.host, apmConfig.mongodb.port, {}), {safe: true});
 
 module.exports.dburl = dburl;
 module.exports.assert = assert;

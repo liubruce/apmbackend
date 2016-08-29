@@ -50,10 +50,14 @@ var apmConfig = {
     web: {
         port: 6001,
         host: "localhost",
-        use_intercom: true
+        use_intercom: false
     },
 	path: "",
-	cdn: ""
+	cdn: "",
+    logging: {
+        info: ["jobs", "push"],
+        default: "warn"
+    }
 };
 
 module.exports = apmConfig;

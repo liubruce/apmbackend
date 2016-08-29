@@ -2,9 +2,9 @@ var common = {},
     moment = require('moment'),
     time = require('time')(Date),
     crypto = require('crypto');
-var logger = require('log4js').getLogger("common");
-//    logger = require('./log.js'),
-//    countlyConfig = require('./../config', 'dont-enclose');
+//var logger = require('log4js').getLogger("common");
+var    logger = require('./log.js'),
+    apmConfig = require('../../config/config.js', 'dont-enclose');
 
 (function (common) {
 
@@ -61,7 +61,7 @@ var logger = require('log4js').getLogger("common");
     
     //common.db = plugins.dbConnection(countlyConfig);
 
-    common.config = countlyConfig;
+    common.config = apmConfig;
 
     common.time = time;
 
@@ -400,6 +400,9 @@ var logger = require('log4js').getLogger("common");
     };
 
     common.returnMessage = function (params, returnCode, message) {
+        console.log('错误：' + message);
+
+
         if (params && params.res && !params.blockResponses) {
             params.res.writeHead(returnCode, {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin':'*'});
             if (params.qstring.callback) {
@@ -408,11 +411,13 @@ var logger = require('log4js').getLogger("common");
                 params.res.write(JSON.stringify({result: message}));
             }
 
-            params.res.end();
+           params.res.end();
         }
     };
 
     common.returnOutput = function (params, output) {
+        //console.log('returnOutput：' + JSON.stringify(output));
+
         if (params && params.res && !params.blockResponses) {
             params.res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin':'*'});
             if (params.qstring.callback) {
