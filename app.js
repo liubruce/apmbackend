@@ -228,40 +228,6 @@ app = expose(app);
 //app.use(app.router);
 
 
-pluginManager.setConfigs("api", {
-    domain: "",
-    safe: false,
-    session_duration_limit: 120,
-    city_data: true,
-    event_limit: 500,
-    event_segmentation_limit: 100,
-    event_segmentation_value_limit:1000,
-    sync_plugins: false,
-    session_cooldown: 15,
-    total_users: true
-});
-
-pluginManager.setConfigs("apps", {
-    country: "TR",
-    timezone: "Europe/Istanbul",
-    category: "6"
-});
-
-pluginManager.setConfigs('logs', {
-    debug:      (apmConfig.logging && apmConfig.logging.debug)     ?  apmConfig.logging.debug.join(', ')    : '',
-    info:       (apmConfig.logging && apmConfig.logging.info)      ?  apmConfig.logging.info.join(', ')     : '',
-    warning:    (apmConfig.logging && apmConfig.logging.warning)   ?  apmConfig.logging.warning.join(', ')  : '',
-    error:      (apmConfig.logging && apmConfig.logging.error)     ?  apmConfig.logging.error.join(', ')    : '',
-    default:    (apmConfig.logging && apmConfig.logging.default)   ?  apmConfig.logging.default : 'warning'
-}, undefined, function(config){
-    var cfg = pluginManager.getConfig('logs'), msg = {cmd: 'log', config: cfg};
-    if (process.send) { process.send(msg); }
-    require('./api/utils/log.js').ipcHandler(msg);
-});
-
-pluginManager.init();
-
-
 app.use('/', routes);
 app.use('/users', users);
 app.use('/', apiformobile);
