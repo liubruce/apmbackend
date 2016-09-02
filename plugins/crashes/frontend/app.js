@@ -11,6 +11,7 @@ catch(err) {}
 (function (plugin) {
 	plugin.init = function(app, countlyDb){
 		app.get(apmConfig.path+'/crash/*', function(req, res) {
+		    console.log('crash查询');
             var parts = req.url.split("/");
 			var code = parts[parts.length-1];
             countlyDb.collection('crash_share').findOne({_id:code},function(err, crash) {

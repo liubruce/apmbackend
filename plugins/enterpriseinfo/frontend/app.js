@@ -41,7 +41,7 @@ var plugin = {},
                     if (memberCount) {
                         if (req.query.message)
                             req.flash('info', req.query.message);
-                        res.render('../../../plugins/enterpriseinfo/frontend/public/templates/login', {
+                        res.render('../plugins/enterpriseinfo/frontend/public/templates/login', {
                             "countlyTitle": versionInfo.title,
                             "countlyPage": versionInfo.page,
                             "message": req.flash('info'),

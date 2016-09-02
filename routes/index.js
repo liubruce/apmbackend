@@ -133,14 +133,12 @@ var checkRequestForSession = function (req, res, next) {
 
 
 router.get(apmConfig.path+'/ping', function(req, res, next) {
-    dbconnect.MongoClient.connect(dbconnect.dburl, function (err, db) {
-        db.collection("plugins").find({_id: "plugins"}, function (err, result) {
+        countlyDb.collection("plugins").find({_id: "plugins"}, function (err, result) {
             if (err)
                 res.status(404).send("DB Error");
             else
                 res.send("Success");
         });
-    });
 });
 
 router.get(apmConfig.path+'/session', function(req, res, next) {
@@ -187,10 +185,9 @@ router.get(apmConfig.path + '/dashboard', function (req, res, next) {
     if (!req.session.uid) {
         res.redirect(apmConfig.path + '/login');
     } else {
-        dbconnect.MongoClient.connect(dbconnect.dburl, function (err, db) {
             var searchStr = {"_id": require('mongodb').ObjectID(req.session.uid)};
             //console.log(searchStr);
-            db.collection('members').find(searchStr).toArray(function (err, members) { //db.ObjectID(
+            countlyDb.collection('members').find(searchStr).toArray(function (err, members) { //db.ObjectID(
                 var member;
                 //console.dir(members);
                 if (members.length === 1) var member = members[0];
@@ -207,7 +204,7 @@ router.get(apmConfig.path + '/dashboard', function (req, res, next) {
                     //console.log('global_admin:' + member['global_admin']);
 
                     if (member['global_admin']) {
-                        db.collection('apps').find({}).toArray(function (err, apps) {
+                        countlyDb.collection('apps').find({}).toArray(function (err, apps) {
                             adminOfApps = apps;
                             userOfApps = apps;
                             console.dir('apps:' + apps);
@@ -253,18 +250,18 @@ router.get(apmConfig.path + '/dashboard', function (req, res, next) {
                             userOfAppIds[userOfAppIds.length] = require('mongodb').ObjectID(member.user_of[i]);
                         }
 
-                        db.collection('apps').find({_id: {'$in': adminOfAppIds}}).toArray(function (err, admin_of) {
+                        countlyDb.collection('apps').find({_id: {'$in': adminOfAppIds}}).toArray(function (err, admin_of) {
 
                             for (var i = 0; i < admin_of.length; i++) {
                                 apmGlobalApps[admin_of[i]["_id"]] = admin_of[i];
                                 apmGlobalApps[admin_of[i]["_id"]]["_id"] = "" + admin_of[i]["_id"];
                             }
 
-                            db.collection('apps').find({_id: {'$in': userOfAppIds}}).toArray(function (err, user_of) {
+                            countlyDb.collection('apps').find({_id: {'$in': userOfAppIds}}).toArray(function (err, user_of) {
                                 adminOfApps = admin_of;
                                 userOfApps = user_of;
 
-                                db.collection('graph_notes').find({_id: {'$in': userOfAppIds}}).toArray(function (err, notes) {
+                                countlyDb.collection('graph_notes').find({_id: {'$in': userOfAppIds}}).toArray(function (err, notes) {
                                     var appNotes = [];
                                     for (var i = 0; i < notes.length; i++) {
                                         appNotes[notes[i]["_id"]] = notes[i]["notes"];
@@ -412,17 +409,13 @@ router.get(apmConfig.path + '/dashboard', function (req, res, next) {
                     res.redirect(apmConfig.path + '/login');
                 }
             });
-        });
     }
 });
 
 router.get('/setup', function (req, res, next) {
 
-    dbconnect.MongoClient.connect(dbconnect.dburl, function (err, db) {
-        dbconnect.assert.equal(null, err);
-        console.log("Connected correctly to server");
 
-        db.collection('members').count({}, function (err, memberCount) {
+        countlyDb.collection('members').count({}, function (err, memberCount) {
             if (memberCount) {
                 res.redirect('/login');
             } else {
@@ -436,17 +429,13 @@ router.get('/setup', function (req, res, next) {
                 });
             }
         });
-    });
 });
 
 router.get('/login', function (req, res, next) {
     if (req.session.uid) {
         res.redirect('/dashboard');
     } else {
-        dbconnect.MongoClient.connect(dbconnect.dburl, function (err, db) {
-            dbconnect.assert.equal(null, err);
-            console.log("Connected correctly to server");
-            db.collection('members').count({}, function (err, memberCount) {
+            countlyDb.collection('members').count({}, function (err, memberCount) {
                 if (memberCount) {
                     if (req.query.message) req.flash('info', req.query.message);
                     res.render('login', {
@@ -463,8 +452,6 @@ router.get('/login', function (req, res, next) {
                 }
             });
 
-
-        });
 
     }
 });
@@ -542,8 +529,7 @@ router.post(apmConfig.path+'/forgot', function (req, res, next) {
 });
 
 router.post(apmConfig.path + '/setup', function (req, res, next) {
-    dbconnect.MongoClient.connect(dbconnect.dburl, function (err, db) {
-        db.collection('members').count({}, function (err, memberCount) {
+        countlyDb.collection('members').count({}, function (err, memberCount) {
             if (memberCount) {
                 res.redirect(apmConfig.path + '/login');
             } else {
@@ -605,7 +591,6 @@ router.post(apmConfig.path + '/setup', function (req, res, next) {
                 }
             }
         });
-    });
 });
 
 
@@ -613,12 +598,11 @@ router.post(apmConfig.path + '/setup', function (req, res, next) {
 router.post(apmConfig.path+'/login', function (req, res, next) {
     if (req.body.username && req.body.password) {
         var password = sha1Hash(req.body.password);
-        dbconnect.MongoClient.connect(dbconnect.dburl, function (err, db) {
             var searchStr = {
                 $or: [{"username": req.body.username}, {"email": req.body.username}],
                 "password": password
             };
-            db.collection('members').find(searchStr).toArray(function (err, members) {
+            countlyDb.collection('members').find(searchStr).toArray(function (err, members) {
                 if (members.length === 1) {
                     var member = members[0];
 
@@ -630,7 +614,7 @@ router.post(apmConfig.path+'/login', function (req, res, next) {
                     req.session.email = member["email"];
                     req.session.settings = member.settings;
                     if (req.body.lang && req.body.lang != member["lang"]) {
-                        db.collection('members').update({_id: member["_id"]}, {$set: {lang: req.body.lang}}, function () {
+                        countlyDb.collection('members').update({_id: member["_id"]}, {$set: {lang: req.body.lang}}, function () {
                         });
                     }
                     if (plugins.getConfig("frontend", member.settings).session_timeout)
@@ -642,7 +626,6 @@ router.post(apmConfig.path+'/login', function (req, res, next) {
                 }
             }
             });
-        });
     } else {
         res.redirect(apmConfig.path+'/login?message=login.result');
     }

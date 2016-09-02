@@ -92,7 +92,7 @@ function createUser(req, res) {
         findUsers(db, 'bruce.liu@dclingcloud.com', 'bruceliu', function(docs, ifExist){
             insertUser(db, docs, ifExist)
         });
-
+        db.close();
     });
 
 }

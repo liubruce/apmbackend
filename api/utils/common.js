@@ -4,6 +4,7 @@ var common = {},
     crypto = require('crypto');
 //var logger = require('log4js').getLogger("common");
 var    logger = require('./log.js'),
+    plugins = require('../../plugins/pluginManager.js'),
     apmConfig = require('../../config/config.js', 'dont-enclose');
 
 (function (common) {
@@ -59,7 +60,7 @@ var    logger = require('./log.js'),
         'previous_events': 'pe'
     };
     
-    //common.db = plugins.dbConnection(countlyConfig);
+    common.db = plugins.dbConnection(apmConfig);
 
     common.config = apmConfig;
 
@@ -400,7 +401,7 @@ var    logger = require('./log.js'),
     };
 
     common.returnMessage = function (params, returnCode, message) {
-        console.log('错误：' + message);
+        console.log('返回信息：' + message);
 
 
         if (params && params.res && !params.blockResponses) {
@@ -410,8 +411,8 @@ var    logger = require('./log.js'),
             } else {
                 params.res.write(JSON.stringify({result: message}));
             }
-
-           params.res.end();
+            console.log(' 到这来结束了!')
+           params.res.status(returnCode).end();
         }
     };
 

@@ -27,7 +27,7 @@ var pluginManager = require('./plugins/pluginManager.js');
 pluginManager.setConfigs("frontend", {
     production: false,
     theme: "",
-    session_timeout: 30*60*1000,
+    session_timeout: 30 * 60 * 1000,
     use_google: false,
     code: true
 });
@@ -53,42 +53,40 @@ var countlyDb = pluginManager.dbConnection(apmConfig);
 
 var loadedThemes = {};
 var curTheme;
-app.loadThemeFiles = function(theme, callback){
+app.loadThemeFiles = function (theme, callback) {
     //console.log(theme);
-    if(!loadedThemes[theme]){
-        var tempThemeFiles = {css:[], js:[]};
-        if(theme && theme.length){
-            var themeDir = path.resolve(__dirname, "public/themes/"+theme+"/");
-            fs.readdir(themeDir, function(err, list) {
-                if (err){
-                    if(callback)
+    if (!loadedThemes[theme]) {
+        var tempThemeFiles = {css: [], js: []};
+        if (theme && theme.length) {
+            var themeDir = path.resolve(__dirname, "public/themes/" + theme + "/");
+            fs.readdir(themeDir, function (err, list) {
+                if (err) {
+                    if (callback)
                         callback(tempThemeFiles);
-                    return ;
+                    return;
                 }
                 var ext;
-                for(var i = 0; i < list.length; i++){
+                for (var i = 0; i < list.length; i++) {
                     ext = list[i].split(".").pop();
-                    if(!tempThemeFiles[ext])
+                    if (!tempThemeFiles[ext])
                         tempThemeFiles[ext] = [];
-                    tempThemeFiles[ext].push(apmConfig.path+'/themes/'+theme+"/"+list[i]);
+                    tempThemeFiles[ext].push(apmConfig.path + '/themes/' + theme + "/" + list[i]);
                 }
-                if(callback)
+                if (callback)
                     callback(tempThemeFiles);
                 loadedThemes[theme] = tempThemeFiles;
             });
         }
-        else if(callback)
+        else if (callback)
             callback(tempThemeFiles);
     }
-    else if(callback)
+    else if (callback)
         callback(loadedThemes[theme]);
 };
 
-dbconnect.MongoClient.connect(dbconnect.dburl, function (err, db) {
-    pluginManager.loadConfigs(db, function () {
-        curTheme = pluginManager.getConfig("frontend").theme;
-        app.loadThemeFiles(pluginManager.getConfig("frontend").theme);
-    });
+pluginManager.loadConfigs(countlyDb, function () {
+    curTheme = pluginManager.getConfig("frontend").theme;
+    app.loadThemeFiles(pluginManager.getConfig("frontend").theme);
 });
 
 app.engine('html', require('ejs').renderFile);
@@ -102,16 +100,14 @@ app.set('view options', {layout: false});
 
 //app.use(express.static(path.join(__dirname, 'public')));
 
-dbconnect.MongoClient.connect(dbconnect.dburl, function (err, db) {
-    dbconnect.assert.equal(null, err);
-    //console.log('app js start');
-    pluginManager.loadAppStatic(app, db, express);
-    //console.log('app js end');
-});
+//console.log('app js start');
+pluginManager.loadAppStatic(app, countlyDb, express);
 
 app.use(cookieParser());
 
 //server theme images
+
+
 app.use(function (req, res, next) {
     if (req.url.indexOf(apmConfig.path + '/images/') === 0) {
         var url = req.url.replace(apmConfig.path, "");
@@ -135,22 +131,17 @@ app.use(function (req, res, next) {
 });
 
 var oneYear = 31557600000;
-//console.log(countlyConfig.path);
-//console.log(__dirname + '/public');
-//express.static(__dirname + '/public')
+
 app.use(apmConfig.path, express.static(__dirname + '/public', {maxAge: oneYear}));
 
 var tempPlugins = pluginManager.getPlugins();
-//console.log('plugins:' + tempPlugins);
 
-for(var i = 0, l = tempPlugins.length; i < l; i++){
-    app.use(apmConfig.path + '/'+ tempPlugins[i], express.static(__dirname+ '/plugins/'+ tempPlugins[i]+"/frontend/public", { maxAge:31557600000 }));
-    //console.log('plugins:' + tempPlugins[i]);
+for (var i = 0, l = tempPlugins.length; i < l; i++) {
+    app.use(apmConfig.path + '/' + tempPlugins[i], express.static(__dirname + '/plugins/' + tempPlugins[i] + "/frontend/public", {maxAge: 31557600000}));
 }
 
 var session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
-
 
 
 app.use(session({
@@ -166,27 +157,26 @@ app.use(session({
 //app.use(bodyParser({uploadDir: __dirname + '/uploads'}));
 
 app.use(flash());
+
+
 app.use(function (req, res, next) {
-    dbconnect.MongoClient.connect(dbconnect.dburl, function (err, db) {
-        dbconnect.assert.equal(null, err);
-        pluginManager.loadConfigs(db, function () {
-            curTheme = pluginManager.getConfig("frontend").theme;
-            app.loadThemeFiles(req.cookies.theme || pluginManager.getConfig("frontend").theme, function (themeFiles) {
-                res.locals.flash = req.flash.bind(req);
-                req.config = pluginManager.getConfig("frontend");
-                req.themeFiles = themeFiles;
-                var _render = res.render;
-                res.render = function (view, opts, fn, parent, sub) {
-                    if (!opts["path"])
-                        opts["path"] = apmConfig.path || "";
-                    if (!opts["cdn"])
-                        opts["cdn"] = apmConfig.cdn || "";
-                    if (!opts["themeFiles"])
-                        opts["themeFiles"] = themeFiles;
-                    _render.call(res, view, opts, fn, parent, sub);
-                };
-                next();
-            });
+    pluginManager.loadConfigs(countlyDb, function () {
+        curTheme = pluginManager.getConfig("frontend").theme;
+        app.loadThemeFiles(req.cookies.theme || pluginManager.getConfig("frontend").theme, function (themeFiles) {
+            res.locals.flash = req.flash.bind(req);
+            req.config = pluginManager.getConfig("frontend");
+            req.themeFiles = themeFiles;
+            var _render = res.render;
+            res.render = function (view, opts, fn, parent, sub) {
+                if (!opts["path"])
+                    opts["path"] = apmConfig.path || "";
+                if (!opts["cdn"])
+                    opts["cdn"] = apmConfig.cdn || "";
+                if (!opts["themeFiles"])
+                    opts["themeFiles"] = themeFiles;
+                _render.call(res, view, opts, fn, parent, sub);
+            };
+            next();
         });
     });
 });
@@ -195,26 +185,26 @@ app.use(function (req, res, next) {
 app.use(methodOverride('X-HTTP-Method-Override'));
 
 /*
-var csurf = require('csurf');
+ var csurf = require('csurf');
 
-app.use(function (req, res, next) {
-    if (req.method == "GET" || req.method == 'HEAD' || req.method == 'OPTIONS') {
-        //csrf not used, but lets regenerate token
-        csurf(req, res, next);
-    }
-    else if (!plugins.callMethod("skipCSRF", {req: req, res: res, next: next})) {
-        //none of the plugins requested to skip csrf for this request
-        csurf(req, res, next);
-    } else {
-        //skipping csrf step, some plugin needs it without csrf
-        next();
-    }
-});*/
+ app.use(function (req, res, next) {
+ if (req.method == "GET" || req.method == 'HEAD' || req.method == 'OPTIONS') {
+ //csrf not used, but lets regenerate token
+ csurf(req, res, next);
+ }
+ else if (!plugins.callMethod("skipCSRF", {req: req, res: res, next: next})) {
+ //none of the plugins requested to skip csrf for this request
+ csurf(req, res, next);
+ } else {
+ //skipping csrf step, some plugin needs it without csrf
+ next();
+ }
+ });
+
+*/
 
 
-dbconnect.MongoClient.connect(dbconnect.dburl, function (err, db) {
-    pluginManager.loadAppPlugins(app, db, express);
-});
+pluginManager.loadAppPlugins(app, countlyDb, express);
 
 app.use(favicon(__dirname + '/public/images/favicon.png'));
 
@@ -225,18 +215,52 @@ app.use(log4js.connectLogger(log4js.getLogger("http"), {level: 'auto'}));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
+
 //app.use(multer());
 
 
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-
 app = expose(app);
 
 
-
 //app.use(app.router);
+
+
+pluginManager.setConfigs("api", {
+    domain: "",
+    safe: false,
+    session_duration_limit: 120,
+    city_data: true,
+    event_limit: 500,
+    event_segmentation_limit: 100,
+    event_segmentation_value_limit:1000,
+    sync_plugins: false,
+    session_cooldown: 15,
+    total_users: true
+});
+
+pluginManager.setConfigs("apps", {
+    country: "TR",
+    timezone: "Europe/Istanbul",
+    category: "6"
+});
+
+pluginManager.setConfigs('logs', {
+    debug:      (apmConfig.logging && apmConfig.logging.debug)     ?  apmConfig.logging.debug.join(', ')    : '',
+    info:       (apmConfig.logging && apmConfig.logging.info)      ?  apmConfig.logging.info.join(', ')     : '',
+    warning:    (apmConfig.logging && apmConfig.logging.warning)   ?  apmConfig.logging.warning.join(', ')  : '',
+    error:      (apmConfig.logging && apmConfig.logging.error)     ?  apmConfig.logging.error.join(', ')    : '',
+    default:    (apmConfig.logging && apmConfig.logging.default)   ?  apmConfig.logging.default : 'warning'
+}, undefined, function(config){
+    var cfg = pluginManager.getConfig('logs'), msg = {cmd: 'log', config: cfg};
+    if (process.send) { process.send(msg); }
+    require('./api/utils/log.js').ipcHandler(msg);
+});
+
+pluginManager.init();
+
 
 app.use('/', routes);
 app.use('/users', users);

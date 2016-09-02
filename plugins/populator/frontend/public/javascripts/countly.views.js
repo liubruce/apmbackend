@@ -26,6 +26,7 @@ window.PopulatorView = countlyView.extend({
                 if (!result) {
                     return true;
                 }
+
                 maxTime = parseInt($( "#populate-maxtime" ).val()) || maxTime;
                 maxTimeout = setTimeout(function(){
                     $("#populator-status").fadeOut().text(jQuery.i18n.map["populator.processing"]).fadeIn();
@@ -53,8 +54,7 @@ window.PopulatorView = countlyView.extend({
                             $("#populate-bar div").css({width: 0});
                         }
                     });
-                }, maxTime*1000);
-                
+                },  maxTime*1000 );
                 fromDate = $( "#populate-from" ).datepicker( "getDate" ) || fromDate;
                 toDate = $( "#populate-to" ).datepicker( "getDate" ) || toDate;
                 countlyPopulator.setStartTime(fromDate.getTime()/1000);
@@ -65,6 +65,7 @@ window.PopulatorView = countlyView.extend({
                 $("#populator-status").fadeOut().text(jQuery.i18n.map["populator.generating"]).fadeIn();
                 $("#populate-bar div").animate({width:"100%"}, maxTime*1000);
             });
+
         });
         $("#stop-populate").on('click', function() {
             if(maxTimeout){
