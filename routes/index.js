@@ -5,7 +5,7 @@ var log = require('log4js').getLogger("index");
 var accessdb = require('../service/accessdb');
 var dbconnect = require('../dbconfig/dbconnect');
 var apmConfig = require('../config/config', 'dont-enclose');
-var apmStats = require('../api/parts/data/stats.js');
+//var apmStats = require('../api/parts/data/stats.js');
 
 var versionInfo = require('../version.info'),
     APM_VERSION = versionInfo.version,
@@ -21,7 +21,7 @@ var
     stringJS = require('string'),
     flash = require('connect-flash'),
     _ = require('underscore'),
-    apmMail = require('../api/parts/mgmt/mail.js'),
+//    apmMail = require('../api/parts/mgmt/mail.js'),
     plugins = require('../plugins/pluginManager.js');
 
 var APM_NAMED_TYPE = "Application Trace v" + APM_VERSION;
@@ -432,6 +432,9 @@ router.get('/setup', function (req, res, next) {
 });
 
 router.get('/login', function (req, res, next) {
+
+   // console.log('登录开始了!')
+
     if (req.session.uid) {
         res.redirect('/dashboard');
     } else {
@@ -439,8 +442,8 @@ router.get('/login', function (req, res, next) {
                 if (memberCount) {
                     if (req.query.message) req.flash('info', req.query.message);
                     res.render('login', {
-                        countlyTitle: 'LingCloud',
-                        countlyPage: '',
+                        appTraceTitle: '灵云科技',
+                        appTracePage: '',
                         "message": 'info',
                         "csrf": req.session._csrf,
                         path: '' || "",
@@ -545,7 +548,7 @@ router.post(apmConfig.path + '/setup', function (req, res, next) {
                     };
                     if (req.body.lang)
                         doc.lang = req.body.lang;
-                    db.collection('members').insertOne(doc, {safe: true}, function (err, member) {
+                    countlyDb.collection('members').insertOne(doc, {safe: true}, function (err, member) {
                         member = member.ops;
                         if (apmConfig.web.use_intercom) {
                             var options = {
@@ -564,7 +567,7 @@ router.post(apmConfig.path + '/setup', function (req, res, next) {
                                 a.api_key = md5Hash(member[0]._id + (new Date).getTime());
                                 b && (b.in_user_id && (a.in_user_id = b.in_user_id), b.in_user_hash && (a.in_user_hash = b.in_user_hash));
 
-                                db.collection("members").updateOne({_id: member[0]._id}, {$set: a}, function (err, mem) {
+                                countlyDb.collection("members").updateOne({_id: member[0]._id}, {$set: a}, function (err, mem) {
                                     plugins.callMethod("setup", {req: req, res: res, next: next, data: member[0]});
                                     req.session.uid = member[0]._id;
                                     req.session.gadm = !0;
@@ -577,7 +580,7 @@ router.post(apmConfig.path + '/setup', function (req, res, next) {
                             a = {};
                             a.api_key = md5Hash(member[0]._id + (new Date).getTime());
 
-                            db.collection("members").updateOne({_id: member[0]._id}, {$set: a}, function () {
+                            countlyDb.collection("members").updateOne({_id: member[0]._id}, {$set: a}, function () {
                                 req.session.uid = member[0]._id;
                                 req.session.gadm = !0;
                                 req.session.email = member[0].email;
@@ -826,8 +829,10 @@ router.post(apmConfig.path+'/users/check/username', function (req, res, next) {
 
     countlyDb.collection('members').findOne({username:req.body.username}, function (err, member) {
         if (member || err) {
+            console.log('用户名:' + req.body.username + '存在');
             res.send(false);
         } else {
+            console.log('用户名:' + req.body.username + '不存在');
             res.send(true);
         }
     });

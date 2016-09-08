@@ -66,6 +66,7 @@ window.ReportingView = countlyView.extend({
         }
         
         var data = countlyReporting.getData();
+        data = JSON.parse(data);
         for(var i = 0; i < data.length; i++){
             if(data[i].apps && data[i].apps.length){
                 data[i].appNames = CountlyHelpers.appIdsToNames(data[i].apps).split(", ");

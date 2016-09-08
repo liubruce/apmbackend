@@ -2,95 +2,77 @@
 
 <html>
 <head>
-	<link href='stylesheets/pre-login/main.css' rel='stylesheet' type='text/css'>
-	<link rel="icon" type="image/png" href="images/favicon.png">
-    <% if (themeFiles && themeFiles.css) { %>
-        <% for(var i=0, l=themeFiles.css.length; i<l; i++) {%>
-    <link href='<%= themeFiles.css[i]%>' rel='stylesheet' type='text/css'>
-        <% } %>
-    <% } %>
-	<title><%- countlyTitle %></title>
-	<script>window.countlyGlobal = window.countlyGlobal || {}; countlyGlobal["cdn"] = "<%- cdn %>";</script>
+    <meta charset="UTF-8">
+    <link rel="icon" href="images/logo/favicon.ico" type="image/png">
+    <link rel="stylesheet" href="stylesheets/login.css" type='text/css'>
+    <title><%- appTraceTitle %></title>
+    <script>window.countlyGlobal = window.countlyGlobal || {}; countlyGlobal["cdn"] = "<%- cdn %>";</script>
 </head>
 <body>
-	 <% if (message){ %>
-		<div id="message"></div>
-	 <% } %>
-	<div id="top-container">
-		<% if (countlyPage){ %>
-		<a class="top-button" href="<%- countlyPage %>"><%- countlyTitle %></a>
-        <% } %>
-		<div class="top-button" id="select-lang">
-			<div id="active-lang">EN</div>
-			<div id="langs">
-				<div class="group">
-					<a data-language-code="de" class="item">Deutsch</a>
-					<a data-language-code="en" class="item">English</a>
-					<a data-language-code="es" class="item">Español</a>
-					<a data-language-code="fr" class="item">Français</a>
-					<a data-language-code="it" class="item">Italiano</a>
-                    <a data-language-code="nl" class="item">Nederlands</a>
-					<a data-language-code="lv" class="item">Latviski</a>
-				</div>
-				<div class="group">
-					<a data-language-code="et" class="item">Eesti</a>
-                    <a data-language-code="pt" class="item">Português</a>
-                    <a data-language-code="ru" class="item">Русский язык</a>
-					<a data-language-code="tr" class="item">Türkçe</a>
-					<a data-language-code="zh" class="item">中文</a>
-					<a data-language-code="ja" class="item">日本語</a>
-					<a data-language-code="ko" class="item">한국어</a>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="login-form">
-		<div style="overflow:auto;">
-            <div id="login-logo" style="margin-bottom:30px;"></div>
+
+<% if (message){ %>
+<div id="message"></div>
+<% } %>
+<div id="background">
+    <div class="login">
+        <div>
+            <img src="images/logo/lingyunlogo-min.png" alt="">
+            <div class="btn">
+              <div id="active-lang">EN</div>
+                <div>CONTACT US</div>
+            </div>
+        </div>
+        <div class="login-1">
+            <div class="text">
+                <p>APPTrace是神州灵云科技的新一代智能化的应用性能管理解决方案， 智能化是指从人和业务的理解而不是技术角度去监控应用和业务系统，智能化对业务系统进行360度和7x24小时的健康度监控，观测和分析、报警以及预警。</p>
+                <div style=" width:75px; margin:0 auto;">
+                    <a href="#">了解更多</a>
+                </div>
+                <div class="spot" style="width:50px; margin: 60px auto;position: absolute;bottom:-20px;left:170px;">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </div>
+        </div>
+        <div class="login-2">
             <form method="POST">
-                <div>
-                    <input type="text" autocapitalize="off" name="username" placeholder="Username or Email" data-localize="placeholder.username-email"/>
-                </div>
-                <div>
-                    <input name="password" type="password" placeholder="Password" data-localize="placeholder.password"/>
-                </div>
-                <div>
-                    <input type="hidden" value="<%= csrf %>" name="_csrf" />
-                    <input type="hidden" value="en" name="lang" id="form-lang" />
-                    <input id="login-button" value="Login" type="submit" data-localize="login.button"/>
-                </div>
-                <div style="margin-top:30px;">
-                    <a id="forgot-password" href="./forgot"  data-localize="login.forgot"></a>
-                </div>
+            <div class="nameuser">
+                <input class="input-1" name="username" type="text" value=""><br>
+                <img class="input-1-1" src="images/icon/name.png" alt="">
+                <input class="input-2" name="password" type="password" value=""><br>
+                <img class="input-2-2" src="images/icon/pwd.png" alt="">
+                <input type="hidden" value="<%= csrf %>" name="_csrf" />
+                <input type="hidden" value="en" name="lang" id="form-lang" />
+                <input class="input-3" type="submit" data-localize="login.button"><br>
+            </div>
             </form>
-		</div>
-	</div>
-	<script language="javascript" type="text/javascript" src="javascripts/dom/jquery/jquery-1.8.3.min.js"></script>
-	<script language="javascript" type="text/javascript" src="javascripts/utils/prefixfree.min.js"></script>
-	<script language="javascript" type="text/javascript" src="javascripts/dom/jquery.noisy.min.js"></script>
-	<script language="javascript" type="text/javascript" src="javascripts/utils/store+json2.min.js"></script>
-	<script language="javascript" type="text/javascript" src="javascripts/utils/jquery.i18n.properties-min-1.0.9.js"></script>
-	<script language="javascript" type="text/javascript" src="javascripts/pre-login.js"></script>
-	<script>
-        var countlyTitle = "<%- countlyTitle %>";
-		$(document).ready(function() {
-			<% if (message){ %>
-				showMessage("<%= message %>");
-			<% } %>
-			document.title = countlyTitle + " | " + jQuery.i18n.map["login.title"];
-		});
-		
-		$(document).bind('clyLangChange', function() {
-			document.title = countlyTitle + " | " + jQuery.i18n.map["login.title"];
-		});
-	</script>
-	<% if (typeof javascript != 'undefined') { %>
-	<script><%- javascript %></script>
-	<% } %>
-     <% if (themeFiles && themeFiles.js) { %>
-        <% for(var i=0, l=themeFiles.js.length; i<l; i++) {%>
-    <script language="javascript" type="text/javascript" src="<%=themeFiles.js[i]%>"></script>
+            <div class="aa">
+                <a href="./setup" data-localize="login.register"></a>
+                <a id="forgot-password" href="./forgot"  data-localize="login.forgot"></a>
+            </div>
+        </div>
+    </div>
+</div>
+<script language="javascript" type="text/javascript" src="javascripts/dom/jquery/jquery-1.8.3.min.js"></script>
+<script language="javascript" type="text/javascript" src="javascripts/utils/prefixfree.min.js"></script>
+<script language="javascript" type="text/javascript" src="javascripts/dom/jquery.noisy.min.js"></script>
+<script language="javascript" type="text/javascript" src="javascripts/utils/store+json2.min.js"></script>
+<script language="javascript" type="text/javascript" src="javascripts/utils/jquery.i18n.properties-min-1.0.9.js"></script>
+<script language="javascript" type="text/javascript" src="javascripts/pre-login.js"></script>
+<script>
+    var countlyTitle = "<%- appTraceTitle %>";
+    $(document).ready(function() {
+        <% if (message){ %>
+            showMessage("<%= message %>");
         <% } %>
-    <% } %>
+        document.title = appTraceTitle + " | " + jQuery.i18n.map["login.title"];
+    });
+
+    $(document).bind('clyLangChange', function() {
+        document.title = appTraceTitle + " | " + jQuery.i18n.map["login.title"];
+    });
+</script>
 </body>
 </html>

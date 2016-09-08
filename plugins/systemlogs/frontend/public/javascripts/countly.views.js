@@ -14,6 +14,7 @@ window.SystemLogsView = countlyView.extend({
     },
     renderCommon:function (isRefresh) {
         var data = countlySystemLogs.getData();
+        data = JSON.parse(data);
         this.templateData = {
             "page-title":jQuery.i18n.map["systemlogs.title"]
         };

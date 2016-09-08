@@ -14,6 +14,7 @@ window.ErrorLogsView = countlyView.extend({
     },
     renderCommon:function (isRefresh) {
 		var data = countlyErrorLogs.getData();
+        data = JSON.parse(data);
         var download = countlyGlobal["path"]+"/o/errorlogs?api_key="+countlyGlobal.member.api_key+"&app_id="+countlyCommon.ACTIVE_APP_ID+"&download=true&log=";
         this.templateData = {
             "page-title":jQuery.i18n.map["errorlogs.title"],

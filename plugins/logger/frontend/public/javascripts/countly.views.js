@@ -14,6 +14,7 @@ window.LoggerView = countlyView.extend({
     },
     renderCommon:function (isRefresh) {
         var data = countlyLogger.getData();
+		data = JSON.parse(data);
         this.templateData = {
             "page-title":jQuery.i18n.map["logger.title"]
         };

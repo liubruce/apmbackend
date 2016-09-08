@@ -15,6 +15,8 @@ window.PluginsView = countlyView.extend({
     renderCommon:function (isRefresh) {
 
         var pluginsData = countlyPlugins.getData();
+        //console.log(jQuery.i18n.map["plugins.name"]);
+        pluginsData = JSON.parse(pluginsData);
         this.templateData = {
             "page-title":jQuery.i18n.map["plugins.title"]
         };
@@ -37,7 +39,7 @@ window.PluginsView = countlyView.extend({
             this.dtable = $('#plugins-table').dataTable($.extend({}, $.fn.dataTable.defaults, {
                 "aaData": pluginsData,
                 "aoColumns": [
-                    { "mData": function(row, type){return row.title;}, "sType":"string", "sTitle": jQuery.i18n.map["plugins.name"]},
+                    { "mData": function(row, type){return row.title;}, "sType":"string", "sTitle": jQuery.i18n.map["plugins.name"]}, //
                     { "mData": function(row, type){return row.description;}, "sType":"string", "sTitle": jQuery.i18n.map["plugins.description"] },
                     { "mData": function(row, type){return row.version;}, "sType":"string", "sTitle": jQuery.i18n.map["plugins.version"], "sClass":"center" },
                     { "mData": function(row, type){if(!row.enabled) return jQuery.i18n.map["plugins.disabled"]; else return jQuery.i18n.map["plugins.enabled"];}, "sType":"string", "sTitle": jQuery.i18n.map["plugins.status"], "sClass":"center" },
@@ -264,6 +266,16 @@ window.ConfigurationsView = countlyView.extend({
             this.configsData = countlyPlugins.getUserConfigsData();
         else
             this.configsData = countlyPlugins.getConfigsData();
+
+        //this.configsData = JSON.parse(this.configsData);
+        //this.configsData = JSON.parse(JSON.stringify(this.configsData));
+        this.configsData = eval("("+this.configsData+")");
+        //this.configsData = tempConfigs;
+        //console.log("tempConfigs:");
+        //console.log(tempConfigs);
+        console.log('this.configsData:');
+        console.log(this.configsData);
+        console.log('namespace:' + this.namespace);
         var configsHTML;
         var title = jQuery.i18n.map["plugins.configs"];
         if(this.userConfig)
@@ -274,7 +286,8 @@ window.ConfigurationsView = countlyView.extend({
         }
         else
             configsHTML = this.generateConfigsTable(this.configsData);
-        
+
+        console.log(configsHTML);
         
         this.templateData = {
             "page-title":title,
@@ -510,7 +523,15 @@ window.ConfigurationsView = countlyView.extend({
         var configsHTML = "";
         if(!first)
             configsHTML += "<table class='d-table help-zone-vb' cellpadding='0' cellspacing='0'>";
+
+        //configsData = JSON.parse(configsData);
+
+        //console.log(configsData);
+        //console.log('api:' + configsData.api);
+
+
         for(var i in configsData){
+            //console.log('i:' + configsData[i]);
             if(typeof configsData[i] == "object"){
                 if(configsData[i] != null){
                     var label = this.getInputLabel((id+"-"+i).substring(1), i);

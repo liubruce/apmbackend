@@ -8,6 +8,7 @@
 
     //Public Methods
     countlyPlugins.initialize = function (id) {
+        //debugger
 		return $.ajax({
 			type:"GET",
 			url:countlyCommon.API_URL + "/o/plugins",
@@ -15,6 +16,7 @@
                 api_key:countlyGlobal['member'].api_key
             },
 			success:function (json) {
+               // console.log(json);
 				_pluginsData = json;
 			}
 		});
